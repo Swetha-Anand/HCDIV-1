@@ -1,45 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assignment 1 - Singapore 2-Hr Weather Forecast</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         /* CSS styling for the body and overall layout */
         body {
-            background-color: black;
+            background-color: #121212; /* Darker background for contrast */
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
         }
 
         /* CSS styling for the container of the text and table */
         .container {
             width: 80%; /* Set the width of the container */
-            margin: 20px auto; /* Center the container */
+            margin: 0 auto; /* Center the container */
+            text-align: left; /* Left-align text in the container */
+            border-radius: 8px; /* Rounded corners for the container */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+            background-color: #1e1e1e; /* Slightly lighter dark background for the container */
+            padding: 20px; /* Padding inside the container */
+        }
+
+        /* CSS styling for the search bar */
+        .search-container {
+            margin: 20px 0;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px); /* Full width minus padding */
+            padding: 10px; /* Padding inside the search bar */
+            border: none; /* No border */
+            border-radius: 5px; /* Small fillet for rounded corners */
+            background-color: #444; /* Background color for the search bar */
+            color: white; /* Text color for the search bar */
+            font-size: 16px; /* Font size for the search bar */
+            transition: background-color 0.3s; /* Transition effect */
+        }
+
+        input[type="text"]:focus {
+            background-color: #555; /* Change background on focus */
+            outline: none; /* Remove outline */
+        }
+
+        input[type="text"]::placeholder {
+            color: #bbb; /* Placeholder text color */
         }
 
         /* CSS styling for the table */
         table {
             width: 100%; /* Full width for the table */
             border-collapse: collapse;
-            background-color: #333; /* Dark grey background for the table */
+            background-color: #2c2c2c; /* Lighter grey background for the table */
+            border-radius: 5px; /* Small fillet for rounded corners */
+            overflow: hidden; /* Prevents border radius from being cut off */
+            margin-top: 10px; /* Space above the table */
         }
 
         th, td {
-            padding: 10px;
+            padding: 12px; /* Increased padding for more space */
             border: 1px solid #ddd;
             text-align: left; /* Left-align text in table cells */
+            transition: background-color 0.2s; /* Transition effect */
         }
 
         th {
             background-color: #444; /* Slightly lighter grey for the header */
+        }
+
+        tr:nth-child(even) {
+            background-color: #383838; /* Alternate row color */
+        }
+
+        tr:hover {
+            background-color: #555; /* Highlight on hover */
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align: left;">Singapore 2-hr Weather Forecast</h2>
-    <h4 id="timestring" style="text-align: left;">Last Updated: </h4>
+    <h2>Singapore 2-hr Weather Forecast</h2>
+    <h4 id="timestring">Last Updated: </h4>
+
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search for a location...">
+    </div>
+
     <table id="weatherTable">
         <tr>
             <th>Area</th>
@@ -63,8 +114,11 @@ fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast')
     // Reference to the table element where forecast data will be displayed
     const weatherTable = document.getElementById("weatherTable");
 
+    // Store the forecast data for filtering
+    const allForecasts = forecasts.slice(); // Copy of the original forecasts
+
     // Loop through each forecast item and add it as a new row in the table
-    forecasts.forEach(forecast => {
+    allForecasts.forEach(forecast => {
         const row = document.createElement("tr"); // Create a new table row
 
         // Create a cell for the area name
@@ -79,6 +133,22 @@ fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast')
 
         // Add the completed row to the table
         weatherTable.appendChild(row);
+    });
+
+    // Add event listener for the search bar
+    document.getElementById("searchBar").addEventListener("input", function() {
+        const searchTerm = this.value.toLowerCase(); // Get the search term
+        const rows = weatherTable.getElementsByTagName("tr");
+
+        // Loop through all rows and hide those that don't match the search term
+        for (let i = 1; i < rows.length; i++) { // Start from 1 to skip the header
+            const areaName = rows[i].getElementsByTagName("td")[0].textContent.toLowerCase(); // Get the area name
+            if (areaName.includes(searchTerm)) {
+                rows[i].style.display = ""; // Show the row
+            } else {
+                rows[i].style.display = "none"; // Hide the row
+            }
+        }
     });
   })
   .catch(error => console.error("Error fetching data:", error));
