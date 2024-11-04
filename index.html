@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Assignment 1 - Singapore 2-Hr Weather Forecast</title>
+    <style>
+        /* CSS styling for the body and overall layout */
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        /* CSS styling for the container of the text and table */
+        .container {
+            width: 80%; /* Set the width of the container */
+            margin: 20px auto; /* Center the container */
+        }
+
+        /* CSS styling for the table */
+        table {
+            width: 100%; /* Full width for the table */
+            border-collapse: collapse;
+            background-color: #333; /* Dark grey background for the table */
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left; /* Left-align text in table cells */
+        }
+
+        th {
+            background-color: #444; /* Slightly lighter grey for the header */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align: left;">Singapore 2-hr Weather Forecast</h2>
+    <h4 id="timestring" style="text-align: left;">Last Updated: </h4>
+    <table id="weatherTable">
+        <tr>
+            <th>Area</th>
+            <th>Forecast</th>
+        </tr>
+    </table>
+</div>
+
+<script>
+// Fetch data from the 2-hour forecast API
+fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast')
+  .then(response => response.json())
+  .then(responsedata => {
+    // Extract timestamp and forecast data from the JSON response
+    const timestamp = responsedata.items[0].update_timestamp;
+    const forecasts = responsedata.items[0].forecasts;
+
+    // Display the timestamp in a human-readable format
+    document.getElementById("timestring").textContent = `Last Updated: ${new Date(timestamp).toLocaleString()}`;
+
+    // Reference to the table element where forecast data will be displayed
+    const weatherTable = document.getElementById("weatherTable");
+
+    // Loop through each forecast item and add it as a new row in the table
+    forecasts.forEach(forecast => {
+        const row = document.createElement("tr"); // Create a new table row
+
+        // Create a cell for the area name
+        const areaCell = document.createElement("td");
+        areaCell.textContent = forecast.area;
+        row.appendChild(areaCell); // Add the area cell to the row
+
+        // Create a cell for the forecast
+        const forecastCell = document.createElement("td");
+        forecastCell.textContent = forecast.forecast;
+        row.appendChild(forecastCell); // Add the forecast cell to the row
+
+        // Add the completed row to the table
+        weatherTable.appendChild(row);
+    });
+  })
+  .catch(error => console.error("Error fetching data:", error));
+</script>
+
+</body>
+</html>
